@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Practice Tracker(Chemistry)</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Daily Practice tracker(Chemistry)</h1>
+        <form id="test-form">
+            <input type="text" id="test-name" placeholder="Test Name" required>
+            <input type="text" id="test-score" placeholder="Score (e.g., 30/40)" required>
+            <input type="date" id="test-date" required>
+            <button type="submit">Add Test Result</button>
+        </form>
+        <canvas id="resultChart" width="400" height="200"></canvas>
+        <ul id="results-list"></ul>
+
+        <button id="toggle-button">Hide/Show All Tasks</button>
+
+
+
+        <h3>Filtered Results</h3>
+<ul id="filtered-results-list"></ul>
+
+    </div>
+    <div>
+        <input type="date" id="filter-date">
+        <button id="filter-button">Filter by Date</button>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
+<style>body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+.container {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+form {
+    margin-bottom: 20px;
+}
+input {
+    padding: 10px;
+    margin: 5px;
+    width: calc(33.3% - 22px);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+button {
+    padding: 10px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+button:hover {
+    background: #218838;
+}
+
+.delete-button {
+    background-color: #dc3545; /* Bootstrap Danger Color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+.delete-button:hover {
+    background-color: #c82333; /* Darker Red */
+}
+</style>
+
+
+
+
+
+<script>
+ const testForm = document.getElementById('test-form');
+const resultChart = document.getElementById('resultChart').getContext('2d');
+const resultsList = document.getElementById('results-list');
+const filteredResultsList = document.getElementById('filtered-results-list');
+const filterButton = document.getElementById('filter-button');
+const filterDateInput = document.getElementById('filter-date');
+const toggleButton = document.getElementById('toggle-button');
+
+let testResults = [];
+let chart;
+let tasksVisible = true; // Track visibility state
+
+// Load saved test results from localStorage
+function loadResults() {
+    const savedResults = localStorage.getItem('testResults');
+    if (savedResults) {
+        testResults = JSON.parse(savedResults);
+        updateResultsList();
+        updateChart();
+    }
+}
+
+// Save test results to localStorage
+function saveResults() {
+    localStorage.setItem('testResults', JSON.stringify(testResults));
+}
+
+// Format date to "9th Oct 2024"
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const options = { day: 'numeric', month: 'short', year: 'numeric' };
+    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+    
+    // Add ordinal suffix
+    const day = date.getDate();
+    const suffix = (day) => {
+        if (day > 3 && day < 21) return 'th'; // Catch 11th-13th
+        switch (day % 10) {
+            case 1: return 'st';
+            case 2: return 'nd';
+            case 3: return 'rd';
+            default: return 'th';
+        }
+    };
+
+    return formattedDate.replace(/(\d+)/, (match) => `${match}${suffix(match)}`);
+}
+
+testForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    const testName = document.getElementById('test-name').value;
+    const testScore = document.getElementById('test-score').value;
+    const testDate = document.getElementById('test-date').value;
+
+    // Calculate percentage
+    const [score, total] = testScore.split('/').map(Number);
+    const percentage = (score / total) * 100;
+
+    // Add to results
+    testResults.push({ name: testName, score: testScore, date: testDate, percentage });
+
+    // Update results list and save to localStorage
+    updateResultsList();
+    saveResults();
+    
+    // Update chart
+    updateChart();
+
+    // Reset form
+    testForm.reset();
+});
+
+filterButton.addEventListener('click', function () {
+    const filterDate = filterDateInput.value;
+    updateFilteredResultsList(filterDate);
+});
+
+toggleButton.addEventListener('click', function () {
+    tasksVisible = !tasksVisible; // Toggle visibility state
+    updateResultsVisibility();
+});
+
+function updateResultsList() {
+    resultsList.innerHTML = '';
+    testResults.forEach((result, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${result.name}: ${result.score} on ${formatDate(result.date)} (${result.percentage.toFixed(2)}%)`;
+
+        // Create delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.className = 'delete-button';
+        deleteButton.onclick = function () {
+            deleteTestResult(index);
+        };
+
+        li.appendChild(deleteButton);
+        resultsList.appendChild(li);
+    });
+}
+
+function updateFilteredResultsList(filterDate) {
+    filteredResultsList.innerHTML = '';
+    const filteredResults = testResults.filter(result => result.date === filterDate);
+
+    filteredResults.forEach((result, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${result.name}: ${result.score} on ${formatDate(result.date)} (${result.percentage.toFixed(2)}%)`;
+
+        // Create delete button for filtered results
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.className = 'delete-button';
+        deleteButton.onclick = function () {
+            deleteTestResult(index);
+        };
+
+        li.appendChild(deleteButton);
+        filteredResultsList.appendChild(li);
+    });
+}
+
+function deleteTestResult(index) {
+    // Remove the test result from the array
+    testResults.splice(index, 1);
+    
+    // Update results list, chart, and save to localStorage
+    updateResultsList();
+    updateFilteredResultsList(filterDateInput.value); // Update filtered results list after deletion
+    saveResults();
+    updateChart();
+}
+
+function updateChart() {
+    const labels = testResults.map(result => result.name);
+    const data = testResults.map(result => result.percentage);
+    const dates = testResults.map(result => formatDate(result.date)); // Format dates for tooltips
+
+    if (chart) {
+        chart.destroy();
+    }
+
+    chart = new Chart(resultChart, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Test Score Percentage',
+                data: data,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const index = context.dataIndex; // Get the index of the data point
+                            const score = context.raw; // The score value
+                            const date = dates[index]; // Get the formatted date corresponding to the index
+                            return [`Score: ${score.toFixed(2)}%`, `Date: ${date}`]; // Return the tooltip content
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Update visibility of results
+function updateResultsVisibility() {
+    resultsList.style.display = tasksVisible ? 'block' : 'none'; // Show or hide results
+    filteredResultsList.style.display = tasksVisible ? 'block' : 'none'; // Show or hide filtered results
+}
+
+// Call loadResults on page load
+loadResults();
+
+
+</script>

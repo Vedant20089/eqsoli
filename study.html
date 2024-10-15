@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Study Plan Tracker</title>
+    <style>
+        /* CSS Styles */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .task {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9f9f9;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .task.done {
+            background-color: #e0ffe0;
+            text-decoration: line-through;
+        }
+        .task-date {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .task-content {
+            flex: 1;
+        }
+        button {
+            margin-left: 10px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .done-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .undo-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Study Plan Tracker</h1>
+        <div id="taskList">
+            <!-- Tasks will be dynamically added here -->
+        </div>
+    </div>
+
+    
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+<script>
+    const tasks = [
+    // Week 1: Oct 9 - Oct 15
+    { date: 'Oct 9', tasks: [
+        'Math: Complex Numbers & Quadratic Equations',
+        'Physics: Kinematics 1-D, 2-D',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 10', tasks: [
+        'Math: Matrices and Determinants',
+        'Physics: Newton\'s Laws of Motion',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 11', tasks: [
+        'Math: Sequence and Series',
+        'Physics: Work, Power, Energy',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 12', tasks: [
+        'Math: Trigonometric Equations',
+        'Physics: Rotational Dynamics',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 13', tasks: [
+        'Math: Trigonometric Ratio Identities',
+        'Physics: Circular Motion',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 14', tasks: [
+        'Math: Solutions of Triangles (SOT)',
+        'Physics: Center of Mass',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 15', tasks: [
+        'Math: Straight Line & Circle',
+        'Physics: Elasticity',
+        'Practice module questions'
+    ]},
+    // Week 2: Oct 16 - Oct 22
+    { date: 'Oct 16', tasks: [
+        'Chemistry: Atomic Structure',
+        'Chemistry: Concentration Terms',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 17', tasks: [
+        'Chemistry: Ideal Gas',
+        'Review previous topics',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 18', tasks: [
+        'Physics: Revision of Kinematics and NLM',
+        'Math: Revision of Complex Numbers',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 19', tasks: [
+        'Physics: Revision of WPE and RD',
+        'Math: Revision of Matrices',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 20', tasks: [
+        'Chemistry: Start Inorganic Chemistry',
+        'Focus on Periodic Table and Chemical Bonding',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 21', tasks: [
+        'Chemistry: Inorganic Chemistry continued',
+        'Focus on Coordination Compounds',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 22', tasks: [
+        'Chemistry: Inorganic Chemistry continued',
+        'Focus on p-block elements',
+        'Practice module questions'
+    ]},
+    // Week 3: Oct 23 - Oct 24
+    { date: 'Oct 23', tasks: [
+        'Chemistry: Inorganic Chemistry continued',
+        'Finalize key concepts',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 24', tasks: [
+        'Chemistry: Inorganic Chemistry revision',
+        'Prepare summary notes',
+        'Practice module questions'
+    ]},
+    // Leave Period: Oct 25 - Nov 6
+    // Focus on Organic Chemistry and some Inorganic
+    { date: 'Oct 25', tasks: [
+        'Organic Chemistry: IUPAC Nomenclature',
+        'Inorganic Chemistry: Metallurgy',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 26', tasks: [
+        'Organic Chemistry: General Organic Chemistry (GOC)',
+        'Inorganic Chemistry: Qualitative Analysis',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 27', tasks: [
+        'Organic Chemistry: Isomerism',
+        'Inorganic Chemistry: s-block elements',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 28', tasks: [
+        'Organic Chemistry: Reaction Mechanisms',
+        'Inorganic Chemistry: d & f-block elements',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 29', tasks: [
+        'Organic Chemistry: Alkanes, Alkenes, Alkynes',
+        'Inorganic Chemistry: Revision',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 30', tasks: [
+        'Organic Chemistry: Aromatic Compounds',
+        'Inorganic Chemistry: Revision',
+        'Practice module questions'
+    ]},
+    { date: 'Oct 31', tasks: [
+        'Organic Chemistry: Alcohols, Phenols, Ethers',
+        'Inorganic Chemistry: Final Revision',
+        'Practice module questions'
+    ]},
+    { date: 'Nov 1', tasks: [
+        'Organic Chemistry: Aldehydes and Ketones',
+        'Start revising previous topics',
+        'Practice module questions'
+    ]},
+    { date: 'Nov 2', tasks: [
+        'Organic Chemistry: Carboxylic Acids and Derivatives',
+        'Review difficult concepts',
+        'Practice module questions'
+    ]},
+    { date: 'Nov 3', tasks: [
+        'Organic Chemistry: Amines',
+        'Take a mock test',
+        'Analyze performance'
+    ]},
+    { date: 'Nov 4', tasks: [
+        'Organic Chemistry: Biomolecules',
+        'Revise key formulas and reactions',
+        'Practice module questions'
+    ]},
+    { date: 'Nov 5', tasks: [
+        'Organic Chemistry: Polymers',
+        'Revise named reactions',
+        'Practice module questions'
+    ]},
+    { date: 'Nov 6', tasks: [
+        'Organic Chemistry: Final Revision',
+        'Prepare summary notes',
+        'Rest and relax'
+    ]},
+    // Final Days: Nov 7 - Nov 9
+    { date: 'Nov 7', tasks: [
+        'Math & Physics: Quick Revision',
+        'Focus on formulas and concepts',
+        'Light practice'
+    ]},
+    { date: 'Nov 8', tasks: [
+        'Chemistry: Quick Revision',
+        'Focus on weak areas',
+        'Light practice'
+    ]},
+    { date: 'Nov 9', tasks: [
+        'Overall Revision',
+        'Mock tests',
+        'Prepare for exam day'
+    ]},
+    // Exam Day: Nov 10
+    { date: 'Nov 10', tasks: [
+        'Exam Day!',
+        'Stay calm and confident',
+        'Give your best!'
+    ]},
+];
+
+const taskListElement = document.getElementById('taskList');
+
+// Load tasks and mark them as done or undone
+function loadTasks() {
+    tasks.forEach((task, index) => {
+        const taskDiv = document.createElement('div');
+        taskDiv.classList.add('task');
+        taskDiv.id = `task-${index}`;
+
+        const taskContent = document.createElement('div');
+        taskContent.classList.add('task-content');
+
+        const taskDate = document.createElement('div');
+        taskDate.classList.add('task-date');
+        taskDate.textContent = task.date;
+
+        const taskDetails = document.createElement('ul');
+        task.tasks.forEach(item => {
+            const listItem = document.createElement('li');
+            listItem.textContent = item;
+            taskDetails.appendChild(listItem);
+        });
+
+        taskContent.appendChild(taskDate);
+        taskContent.appendChild(taskDetails);
+
+        const buttonContainer = document.createElement('div');
+
+        const doneButton = document.createElement('button');
+        doneButton.classList.add('done-btn');
+        doneButton.textContent = 'Mark as Done';
+        doneButton.addEventListener('click', () => markTaskDone(index));
+
+        const undoButton = document.createElement('button');
+        undoButton.classList.add('undo-btn');
+        undoButton.textContent = 'Undo';
+        undoButton.addEventListener('click', () => undoTaskDone(index));
+
+        buttonContainer.appendChild(doneButton);
+        buttonContainer.appendChild(undoButton);
+
+        taskDiv.appendChild(taskContent);
+        taskDiv.appendChild(buttonContainer);
+        taskListElement.appendChild(taskDiv);
+
+        // Check if task is already marked as done
+        if (localStorage.getItem(`task-${index}`) === 'done') {
+            markTaskDone(index, true);
+        }
+    });
+}
+
+// Mark task as done
+function markTaskDone(index, initializing = false) {
+    const taskDiv = document.getElementById(`task-${index}`);
+    taskDiv.classList.add('done');
+    if (!initializing) {
+        localStorage.setItem(`task-${index}`, 'done');
+    }
+}
+
+// Undo task
+function undoTaskDone(index) {
+    const taskDiv = document.getElementById(`task-${index}`);
+    taskDiv.classList.remove('done');
+    localStorage.removeItem(`task-${index}`);
+}
+
+// Load tasks when page is loaded
+window.onload = loadTasks;
+
+</script>
